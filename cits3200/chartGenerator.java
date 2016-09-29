@@ -9,49 +9,53 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.DateTickUnit;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.data.RangeType;
-import org.jfree.data.time.TimeSeries;
-import org.jfree.data.time.TimeSeriesDataItem;
 import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
-
+import org.jfree.data.time.*;
 public class chartGenerator extends ApplicationFrame
 {
-	static int max;
 	public chartGenerator( String applicationTitle, String chartTitle )
    {
       super(applicationTitle);
-      JFreeChart xylineChart = ChartFactory.createXYLineChart(
+      JFreeChart xylineChart = ChartFactory.createTimeSeriesChart(
     	         chartTitle ,
     	         "Time" ,
     	         "Temperature" ,
     	         createDataset() ,
-    	         PlotOrientation.VERTICAL ,
     	         true , true , false);
 
       ChartPanel chartPanel = new ChartPanel( xylineChart );
-      chartPanel.setPreferredSize( new java.awt.Dimension( 560 , 367 ) );
+      chartPanel.setPreferredSize( new java.awt.Dimension( 1920 , 1080 ) );
+
       final XYPlot plot = xylineChart.getXYPlot( );
+     
       XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer( );
       renderer.setSeriesPaint( 0 , Color.RED );
       renderer.setSeriesStroke( 0 , new BasicStroke( 4.0f ) );
+      DateAxis dateAxis = (DateAxis)plot.getDomainAxis();
+      dateAxis.setDateFormatOverride(new SimpleDateFormat("DD/MM/YYYY HH:mm"));
+      
       plot.setRenderer( renderer );
       plot.setDomainPannable(true);
-      setContentPane( chartPanel );
-      
+      setContentPane( chartPanel );      
    }
 
+
    private static XYDataset createDataset(){
-	     final XYSeries sheep = new XYSeries("Sheep");
+	     final TimeSeries sheep = new TimeSeries("Sheep");
 
 	     File file = new File("data.csv");
 	     FileInputStream fis = null;
@@ -62,16 +66,40 @@ public class chartGenerator extends ApplicationFrame
 	       bis = new BufferedInputStream(fis);
 	       dis = new DataInputStream(bis);
 	       dis.readLine();
-	       int i =0;
+	       int day;
+	       int month;
+	       int year;
+	       int hour;
+	       int minute;
+	       String[] parts;
+	       String[] dateTime;
+	       String dateString;
+	       String timeString;
+	       String[] date;
+	       String[] time;
+	       
 	       while(dis.available() != 0){
 	         String line = dis.readLine();
-	         String[] parts = line.split(",");
-	         System.out.println(i);
-	         System.out.println(parts[1]);
-	         sheep.add(i,Double.parseDouble(parts[1]));
-	         i++;
+	         parts = line.split(",");
+	         System.out.println("Parts is "+parts[0]+" "+parts[1]);
+	         dateTime= parts[0].split(" ");
+	         System.out.println("Date "+dateTime[0]+" Time "+dateTime[1]);
+	         dateString = dateTime[0];
+	         timeString = dateTime[1];
+	         date = dateString.split("/");
+	         time = timeString.split(":");
+	         day = Integer.parseInt(date[0]);
+	         month = Integer.parseInt(date[1]);
+	         year = Integer.parseInt(date[2]);
+	         hour = Integer.parseInt(time[0]);
+	         minute = Integer.parseInt(time[1]);
+	         System.out.println(day);
+	         System.out.println(month);
+	         System.out.println(year);
+	         System.out.println(hour);
+	         System.out.println(minute);
+	         sheep.add(new Minute(minute,hour,day,month,year),Double.parseDouble(parts[1]));
 	       }
-	       max = i;
 	       fis.close();
 	       bis.close();
 	       dis.close();
@@ -83,7 +111,7 @@ public class chartGenerator extends ApplicationFrame
 	     catch(IOException e){
 	       e.printStackTrace();
 	     }
-	     final XYSeriesCollection dataset = new XYSeriesCollection( );
+	     final TimeSeriesCollection dataset = new TimeSeriesCollection( );
 	     dataset.addSeries(sheep);
 	     return dataset;
 	   }

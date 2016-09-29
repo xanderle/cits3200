@@ -1,7 +1,6 @@
 package cits3200;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.BasicStroke;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.File;
@@ -15,13 +14,10 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.DateTickUnit;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.data.RangeType;
+
 import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
 import org.jfree.data.time.*;
@@ -47,7 +43,7 @@ public class chartGenerator extends ApplicationFrame
       renderer.setSeriesStroke( 0 , new BasicStroke( 4.0f ) );
       DateAxis dateAxis = (DateAxis)plot.getDomainAxis();
       dateAxis.setDateFormatOverride(new SimpleDateFormat("DD/MM/YYYY HH:mm"));
-      
+      dateAxis.setVerticalTickLabels(true);
       plot.setRenderer( renderer );
       plot.setDomainPannable(true);
       setContentPane( chartPanel );      
